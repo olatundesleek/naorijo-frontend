@@ -28,6 +28,8 @@ export default function LoginPage() {
       const user = await login(email, password);
       const companies = getCompanyMemberships(user);
       const platform = getPlatformMembership(user);
+      console.log("user", user);
+      console.log("platform", platform, "companies", companies);
       if (platform && companies.length) router.replace("/choose-workspace");
       else if (platform) router.replace("/platform");
       else if (companies.length) router.replace("/workspace");

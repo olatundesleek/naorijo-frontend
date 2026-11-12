@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiRequest, ApiError, errorMessage, setCsrfToken, setUnauthorizedHandler, unwrapData } from "@/lib/api";
+import { normalizeLoginUser, type LoginResponse } from "@/lib/auth";
 import { displayFullName } from "@/lib/permissions";
 
 export type Membership = {
@@ -92,14 +93,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refresh, router]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const result = unwrapData<{ csrfToken: string; user?: CurrentUser }>(
+    const result = unwrapData<LoginResponse<CurrentUser, Membership, PlatformMembership>>(
       await apiRequest<unknown>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       }),
     );
     if (result.csrfToken) setCsrfToken(result.csrfToken);
-    const current = result.user || (await refresh());
+    const current = normalizeLoginUser(result) || (await refresh());
     if (!current) throw new Error("The signed-in account could not be loaded.");
     setUser(current);
     setAuthError("");

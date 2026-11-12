@@ -4,3 +4,11 @@ out/
 coverage/
 .env*
 !.env.example
+/AGENTS.md
+# claude
+/claude
+/.claude/
+# agent
+/agent
+/.agents/
+/agents/
